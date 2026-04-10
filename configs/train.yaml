@@ -6,24 +6,24 @@ training:
   imgsz: 640
   optimizer: SGD
   lr0: 0.01
-  lrf: 0.01          # cosine anneal to 1% of lr0
+  lrf: 0.01 # cosine anneal to 1% of lr0
   momentum: 0.937
   weight_decay: 0.0005
   warmup_epochs: 3
   warmup_momentum: 0.8
-  device: "mps"       # "mps" for Apple Silicon, "0" for CUDA, "cpu" for CPU
+  device: "mps" # "mps" for Apple Silicon, "0" for CUDA, "cpu" for CPU
   workers: 8
-  patience: 30        # early stopping patience
-  amp: true           # mixed precision
+  patience: 30 # early stopping patience
+  amp: true # mixed precision
 
   # 2-stage freeze strategy
-  freeze: 10          # backbone layers to freeze in stage 1
-  freeze_epochs: 5    # epochs to keep backbone frozen
+  freeze: 10 # backbone layers to freeze in stage 1
+  freeze_epochs: 5 # epochs to keep backbone frozen
 
   # Ultralytics built-in augmentations
   mosaic: 1.0
   mixup: 0.15
-  close_mosaic: 20    # disable mosaic for last 20 epochs
+  close_mosaic: 20 # disable mosaic for last 20 epochs
 
   seed: 42
 
@@ -38,4 +38,4 @@ paths:
 wandb:
   enabled: true
   project: wastevision
-  entity: null        # set to your W&B team name
+  entity: null # set to your W&B team name
