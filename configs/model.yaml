@@ -1,0 +1,16 @@
+# YOLOv8 model configuration
+
+model:
+  architecture: yolov8m  # yolov8n / yolov8s / yolov8m / yolov8l / yolov8x
+  pretrained: true
+  nc: 9
+  names:
+    0: cardboard
+    1: food_organics
+    2: glass
+    3: metal
+    4: misc_trash
+    5: paper
+    6: plastic
+    7: textile_trash
+    8: vegetation

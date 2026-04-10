@@ -1,0 +1,15 @@
+path: /Users/dayanbattulga/Desktop/personal-code/projects/WasteVision/data/processed
+train: images/train
+val: images/val
+test: images/test
+nc: 9
+names:
+  0: cardboard
+  1: food_organics
+  2: glass
+  3: metal
+  4: misc_trash
+  5: paper
+  6: plastic
+  7: textile_trash
+  8: vegetation

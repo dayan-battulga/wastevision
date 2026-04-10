@@ -1,0 +1,33 @@
+# Albumentations pipeline configuration
+
+augmentation:
+  train:
+    - name: HorizontalFlip
+      p: 0.5
+    - name: RandomBrightnessContrast
+      brightness_limit: 0.2
+      contrast_limit: 0.2
+      p: 0.5
+    - name: HueSaturationValue
+      hue_shift_limit: 20
+      sat_shift_limit: 30
+      val_shift_limit: 20
+      p: 0.4
+    - name: GaussNoise
+      std_range: [0.1, 0.3]
+      p: 0.3
+    - name: RandomResizedCrop
+      size: [640, 640]
+      scale: [0.5, 1.0]
+      p: 0.6
+    - name: CLAHE
+      clip_limit: 4.0
+      p: 0.3
+    - name: MotionBlur
+      blur_limit: 7
+      p: 0.2
+    - name: ImageCompression
+      quality_range: [60, 90]
+      p: 0.3
+
+  val: []

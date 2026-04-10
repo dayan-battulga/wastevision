@@ -1,0 +1,21 @@
+# AWS deployment configuration
+
+aws:
+  region: us-east-1
+  ecr:
+    repository: wastevision
+    tag: latest
+  ecs:
+    cluster: wastevision-cluster
+    service: wastevision-inference
+    task_family: wastevision-task
+    cpu: 2048       # 2 vCPU
+    memory: 4096    # 4 GB
+    desired_count: 1
+
+inference:
+  port: 8000
+  model_path: weights/best.pt
+  confidence_threshold: 0.25
+  iou_threshold: 0.45
+  max_batch_size: 32

@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: WasteVision ECS Fargate infrastructure
+
+# TODO: Flesh out with VPC, ALB, ECS Cluster, Service, Task Definition, IAM roles
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: wastevision
+  ImageUri:
+    Type: String
+    Description: ECR image URI for the WasteVision container
+  ContainerPort:
+    Type: Number
+    Default: 8000
+
+Resources:
+  # TODO: Add VPC, Subnets, Security Groups
+  # TODO: Add Application Load Balancer
+  # TODO: Add ECS Cluster
+  # TODO: Add ECS Task Definition (reference deploy/aws/ecs-task-def.json)
+  # TODO: Add ECS Service with Fargate launch type
+  # TODO: Add IAM Execution Role and Task Role
+  # TODO: Add CloudWatch Log Group
+
+  Placeholder:
+    Type: AWS::CloudFormation::WaitConditionHandle
+    # Remove this resource and replace with real infrastructure
+
+Outputs:
+  ServiceUrl:
+    Description: URL of the inference service
+    Value: !Sub "http://${EnvironmentName}.example.com:${ContainerPort}"
