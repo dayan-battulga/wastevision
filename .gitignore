@@ -28,14 +28,20 @@ env/
 runs/
 wandb/
 mlruns/
+experiments/
 *.pt
 *.onnx
 *.engine
 *.trt
+*.cache
 
-# Datasets (downloaded at runtime)
+# Datasets and processed data
+data/
 datasets/
-data/raw/
+
+# Generated outputs
+notebooks/aug_test/
+notebooks/gate1_samples/
 
 # OS
 .DS_Store
@@ -49,14 +55,11 @@ Thumbs.db
 logs/
 *.log
 
-# Claude
-CLAUDE.md
-memory-decisions.md
-memory-profile.md
-memory-sessions.md
-memory-preferences.md
+# Node
+node_modules/
+package.json
+package-lock.json
 
-#
-notebooks/
-notebooks/aug_test/
-notebooks/gate1_samples/
+# Claude / memory
+CLAUDE.md
+memory-*.md
