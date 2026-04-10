@@ -104,9 +104,16 @@ def train(config: dict[str, Any]) -> Path:
         **shared_kwargs,
     )
 
-    stage1_best = Path(project) / f"{name}_stage1" / "weights" / "best.pt"
-    stage1_last = Path(project) / f"{name}_stage1" / "weights" / "last.pt"
+    # Use the actual save directory from Ultralytics rather than guessing the path
+    stage1_dir = Path(stage1_results.save_dir)
+    stage1_best = stage1_dir / "weights" / "best.pt"
+    stage1_last = stage1_dir / "weights" / "last.pt"
     checkpoint = stage1_best if stage1_best.exists() else stage1_last
+
+    if not checkpoint.exists():
+        raise FileNotFoundError(
+            f"Stage 1 checkpoint not found. Checked: {stage1_best}, {stage1_last}"
+        )
 
     logger.info("Stage 1 complete. Checkpoint: %s", checkpoint)
 
@@ -129,8 +136,10 @@ def train(config: dict[str, Any]) -> Path:
         **shared_kwargs,
     )
 
-    stage2_best = Path(project) / f"{name}_stage2" / "weights" / "best.pt"
-    stage2_last = Path(project) / f"{name}_stage2" / "weights" / "last.pt"
+    # Use the actual save directory from Ultralytics
+    stage2_dir = Path(stage2_results.save_dir)
+    stage2_best = stage2_dir / "weights" / "best.pt"
+    stage2_last = stage2_dir / "weights" / "last.pt"
     final_best = stage2_best if stage2_best.exists() else stage2_last
 
     experiments_dir = Path("experiments")

@@ -38,6 +38,8 @@ experiments/
 # Datasets and processed data
 data/
 datasets/
+# Local archives — GitHub rejects blobs > 100MB
+processed_data.zip
 
 # Generated outputs
 notebooks/aug_test/
