@@ -11,7 +11,7 @@ training:
   weight_decay: 0.0005
   warmup_epochs: 3
   warmup_momentum: 0.8
-  device: "mps" # "mps" for Apple Silicon, "0" for CUDA, "cpu" for CPU
+  device: "0" # "mps" for Apple Silicon, "0" for CUDA, "cpu" for CPU
   workers: 8
   patience: 30 # early stopping patience
   amp: true # mixed precision

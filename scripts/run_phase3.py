@@ -52,17 +52,25 @@ def run_training() -> Path:
 
 
 def _find_latest_run_dir() -> Path | None:
-    """Find the most recent stage2 training run directory."""
-    runs_dir = PROJECT_ROOT / "runs" / "train"
-    if not runs_dir.exists():
+    """Find the most recent stage2 training run directory.
+
+    Searches both runs/train/ and runs/detect/train/ since Ultralytics
+    may use either depending on the task type.
+    """
+    candidates = []
+    for runs_dir in [
+        PROJECT_ROOT / "runs" / "train",
+        PROJECT_ROOT / "runs" / "detect" / "train",
+    ]:
+        if runs_dir.exists():
+            candidates.extend(
+                d for d in runs_dir.iterdir() if d.is_dir() and "stage2" in d.name
+            )
+
+    if not candidates:
         return None
 
-    candidates = sorted(
-        [d for d in runs_dir.iterdir() if d.is_dir() and "stage2" in d.name],
-        key=lambda p: p.stat().st_mtime,
-        reverse=True,
-    )
-    return candidates[0] if candidates else None
+    return sorted(candidates, key=lambda p: p.stat().st_mtime, reverse=True)[0]
 
 
 def _parse_results_csv(run_dir: Path) -> dict[str, float]:
