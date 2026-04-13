@@ -55,12 +55,19 @@ REALWASTE_LABEL_MAP: dict[str, int] = {
 }
 
 KAGGLE_V2_LABEL_MAP: dict[str, int] = {
-    "cardboard": 0,  # cardboard
-    "glass": 2,      # glass
-    "metal": 3,      # metal
-    "paper": 5,      # paper
-    "plastic": 6,    # plastic
-    "trash": 4,      # misc_trash
+    "cardboard": 0,      # cardboard
+    "biological": 1,     # food_organics
+    "glass": 2,          # glass
+    "white-glass": 2,    # glass
+    "brown-glass": 2,    # glass
+    "green-glass": 2,    # glass
+    "metal": 3,          # metal
+    "battery": 4,        # misc_trash
+    "trash": 4,          # misc_trash
+    "paper": 5,          # paper
+    "plastic": 6,        # plastic
+    "shoes": 7,          # textile_trash
+    "clothes": 7,        # textile_trash
 }
 
 # TACO uses integer category IDs (0-59). Map each to one of the 9 classes.
@@ -259,7 +266,7 @@ def _convert_with_bbox_proposals(
     output_dir: Path,
     label_map: dict[str, int],
     dataset_name: str,
-    confidence_threshold: float = 0.3,
+    confidence_threshold: float = 0.15,
 ) -> int:
     """Convert a folder-based classification dataset using YOLOv8n bbox proposals.
 
