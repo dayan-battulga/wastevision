@@ -426,7 +426,7 @@ def convert_dataset(
     raw_dir: str | Path,
     output_dir: str | Path,
     dataset_name: str,
-    confidence_threshold: float = 0.3,
+    confidence_threshold: float = 0.15,
 ) -> int:
     """Convert a raw dataset to YOLO-format labels and images.
 
