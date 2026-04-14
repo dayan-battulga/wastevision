@@ -261,43 +261,33 @@ def _xyxy_to_yolo(
 _FULL_IMAGE_BBOX = "0.500000 0.500000 1.000000 1.000000"
 
 
-def _convert_with_bbox_proposals(
+def _convert_classification(
     raw_dir: Path,
     output_dir: Path,
     label_map: dict[str, int],
     dataset_name: str,
-    confidence_threshold: float = 0.25,
 ) -> int:
-    """Convert a folder-based classification dataset using YOLOv8n bbox proposals.
+    """Convert a folder-based classification dataset using full-image bboxes.
 
-    A pretrained YOLOv8n (COCO weights) is run on every image to locate
-    objects.  The COCO class predictions are discarded -- the class label
-    comes from the folder name.  If the detector produces zero boxes above
-    ``confidence_threshold``, a full-image fallback bbox is written instead.
+    Each image gets a single full-image bounding box with the class label
+    from the folder name. This is appropriate for classification datasets
+    (RealWaste, Kaggle V2) where no ground-truth bboxes exist.
 
     Args:
         raw_dir: Root with class-name subdirectories containing images.
         output_dir: Destination (images/ and labels/ subdirs will be created).
         label_map: Folder-name to class-index mapping.
         dataset_name: Name used for logging.
-        confidence_threshold: Minimum detector confidence to keep a proposal.
 
     Returns:
         Number of images successfully converted.
     """
-    from ultralytics import YOLO
-
-    detector = YOLO("yolov8n.pt")
-    logger.info("[%s] Loaded YOLOv8n for bbox proposals (conf=%.2f)", dataset_name, confidence_threshold)
-
     images_out = output_dir / "images"
     labels_out = output_dir / "labels"
     images_out.mkdir(parents=True, exist_ok=True)
     labels_out.mkdir(parents=True, exist_ok=True)
 
     converted = 0
-    proposals_used = 0
-    fallbacks_used = 0
 
     for folder_name, class_id in label_map.items():
         class_dir = raw_dir / folder_name
@@ -314,38 +304,15 @@ def _convert_with_bbox_proposals(
                 logger.warning("[%s] Corrupt image, skipping: %s", dataset_name, img_path)
                 continue
 
-            img_h, img_w = image.shape[:2]
-
-            results = detector.predict(
-                source=str(img_path),
-                conf=confidence_threshold,
-                verbose=False,
-            )
-            boxes = results[0].boxes
-
-            yolo_lines: list[str] = []
-            if len(boxes) > 0:
-                for xyxy_tensor in boxes.xyxy:
-                    xyxy = xyxy_tensor.cpu().numpy()
-                    cx, cy, w, h = _xyxy_to_yolo(xyxy, img_w, img_h)
-                    yolo_lines.append(f"{class_id} {cx:.6f} {cy:.6f} {w:.6f} {h:.6f}")
-                proposals_used += 1
-            else:
-                yolo_lines.append(f"{class_id} {_FULL_IMAGE_BBOX}")
-                fallbacks_used += 1
-
             stem = f"{dataset_name}_{folder_name}_{img_path.stem}"
             dst_img = images_out / f"{stem}{img_path.suffix}"
             dst_lbl = labels_out / f"{stem}.txt"
 
             shutil.copy2(img_path, dst_img)
-            dst_lbl.write_text("\n".join(yolo_lines) + "\n")
+            dst_lbl.write_text(f"{class_id} {_FULL_IMAGE_BBOX}\n")
             converted += 1
 
-    logger.info(
-        "[%s] Converted %d images (%d with proposals, %d with fallback bbox)",
-        dataset_name, converted, proposals_used, fallbacks_used,
-    )
+    logger.info("[%s] Converted %d images (full-image bboxes)", dataset_name, converted)
     return converted
 
 
@@ -426,20 +393,17 @@ def convert_dataset(
     raw_dir: str | Path,
     output_dir: str | Path,
     dataset_name: str,
-    confidence_threshold: float = 0.25,
 ) -> int:
     """Convert a raw dataset to YOLO-format labels and images.
 
-    For classification datasets (realwaste, kaggle_v2) a pretrained YOLOv8n
-    generates bounding-box proposals; the class label comes from the folder
-    name.  For TACO the existing COCO annotations are converted directly.
+    Classification datasets (realwaste, kaggle_v2) get full-image bboxes
+    since no ground-truth annotations exist. TACO's COCO annotations are
+    converted to YOLO format directly.
 
     Args:
         raw_dir: Root directory of the raw downloaded dataset.
         output_dir: Directory to write converted images/ and labels/.
         dataset_name: One of 'realwaste', 'kaggle_v2', 'taco'.
-        confidence_threshold: Min detector confidence for bbox proposals
-            (only used by realwaste/kaggle_v2).
 
     Returns:
         Number of images successfully converted.
@@ -456,12 +420,11 @@ def convert_dataset(
     }
 
     if dataset_name in classification_datasets:
-        return _convert_with_bbox_proposals(
+        return _convert_classification(
             raw_dir,
             output_dir,
             classification_datasets[dataset_name],
             dataset_name,
-            confidence_threshold=confidence_threshold,
         )
     if dataset_name == "taco":
         return _convert_taco(raw_dir, output_dir)

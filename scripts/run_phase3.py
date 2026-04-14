@@ -298,16 +298,138 @@ def verify_gate(run_dir: Path) -> bool:
     return all_pass
 
 
+def run_offline_augmentation() -> None:
+    """Apply offline augmentation to the training split before training.
+
+    Uses the existing augment_dataset() from src/augmentation/pipeline.py
+    with class-specific multipliers from configs/train.yaml.
+    Augmented images are written directly into the training directories.
+    """
+    import os
+    import tempfile
+
+    import yaml
+
+    from src.augmentation.pipeline import augment_dataset
+    from src.data.validate import check_class_distribution
+
+    aug_config_path = PROJECT_ROOT / "configs" / "augmentation.yaml"
+    train_config_path = PROJECT_ROOT / "configs" / "train.yaml"
+
+    with open(aug_config_path) as f:
+        aug_yaml = yaml.safe_load(f)
+    with open(train_config_path) as f:
+        train_yaml = yaml.safe_load(f)
+
+    train_transforms = aug_yaml["augmentation"]["train"]
+    aug_cfg = train_yaml.get("offline_augmentation", {})
+    default_mult = aug_cfg.get("default_multiplier", 3)
+    rare_mult = aug_cfg.get("rare_class_multiplier", 5)
+    rare_classes = set(aug_cfg.get("rare_classes", []))
+
+    processed = PROJECT_ROOT / "data" / "processed"
+    train_images = processed / "images" / "train"
+    train_labels = processed / "labels" / "train"
+
+    if not train_images.exists():
+        logger.error("Train images dir not found: %s", train_images)
+        return
+
+    # Log pre-augmentation counts
+    logger.info("=== Offline Augmentation ===")
+    pre_count = len(list(train_images.glob("*")))
+    logger.info("Pre-augmentation training images: %d", pre_count)
+    logger.info("Default multiplier: %d, Rare class multiplier: %d", default_mult, rare_mult)
+    logger.info("Rare classes: %s", [CLASS_NAMES[c] for c in rare_classes])
+
+    # augment_dataset expects data_dir/images/ and data_dir/labels/
+    # but our training data is at images/train/ and labels/train/
+    # Use symlinks in a temp dir to bridge the layout
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp = Path(tmpdir)
+        os.symlink(train_images, tmp / "images")
+        os.symlink(train_labels, tmp / "labels")
+
+        # Pass 1: augment all training data with default multiplier
+        count = augment_dataset(
+            data_dir=tmp,
+            output_dir=tmp,
+            config=train_transforms,
+            multiplier=default_mult,
+        )
+        logger.info("Pass 1 (all classes, x%d): generated %d images", default_mult, count)
+
+    # Pass 2: extra augmentation for rare classes only
+    if rare_classes and rare_mult > default_mult:
+        extra_mult = rare_mult - default_mult
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            rare_img_dir = tmp / "images"
+            rare_lbl_dir = tmp / "labels"
+            rare_img_dir.mkdir()
+            rare_lbl_dir.mkdir()
+
+            # Symlink only rare-class images into the temp dir
+            rare_count = 0
+            for lbl_path in sorted(train_labels.iterdir()):
+                if lbl_path.suffix != ".txt":
+                    continue
+                # Skip augmented copies (already have _aug in name)
+                if "_aug" in lbl_path.stem:
+                    continue
+                text = lbl_path.read_text().strip()
+                if not text:
+                    continue
+                first_class = int(float(text.splitlines()[0].split()[0]))
+                if first_class not in rare_classes:
+                    continue
+
+                # Find matching image
+                for ext in (".jpg", ".jpeg", ".png"):
+                    img_path = train_images / f"{lbl_path.stem}{ext}"
+                    if img_path.exists():
+                        os.symlink(img_path, rare_img_dir / img_path.name)
+                        os.symlink(lbl_path, rare_lbl_dir / lbl_path.name)
+                        rare_count += 1
+                        break
+
+            if rare_count > 0:
+                # Output goes directly into training dirs
+                with tempfile.TemporaryDirectory() as outdir:
+                    out = Path(outdir)
+                    os.symlink(train_images, out / "images")
+                    os.symlink(train_labels, out / "labels")
+
+                    extra = augment_dataset(
+                        data_dir=tmp,
+                        output_dir=out,
+                        config=train_transforms,
+                        multiplier=extra_mult,
+                    )
+                logger.info(
+                    "Pass 2 (rare classes, x%d): %d source images, generated %d",
+                    extra_mult, rare_count, extra,
+                )
+
+    post_count = len(list(train_images.glob("*")))
+    logger.info("Post-augmentation training images: %d (was %d)", post_count, pre_count)
+
+
 def main() -> None:
     """Run training then verify gate, or verify gate on existing run."""
     parser = argparse.ArgumentParser(description="Phase 3 training + gate check")
     parser.add_argument("--gate-only", type=str, default=None,
                         help="Skip training, verify gate on this run directory")
+    parser.add_argument("--skip-augment", action="store_true",
+                        help="Skip offline augmentation step")
     args = parser.parse_args()
 
     if args.gate_only:
         run_dir = Path(args.gate_only)
     else:
+        if not args.skip_augment:
+            run_offline_augmentation()
         best_weights, run_dir = run_training()
         logger.info("Training finished. Best weights: %s", best_weights)
         logger.info("Run directory: %s", run_dir)

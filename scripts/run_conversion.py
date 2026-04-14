@@ -48,7 +48,7 @@ RAW_DATASETS: list[dict[str, str]] = [
 ]
 
 PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
-MIN_SAMPLES_PER_CLASS = 400
+MIN_SAMPLES_PER_CLASS = 800
 SEED = 42
 
 

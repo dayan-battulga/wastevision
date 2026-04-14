@@ -13,7 +13,7 @@ training:
   warmup_momentum: 0.8
   device: "0" # "mps" for Apple Silicon, "0" for CUDA, "cpu" for CPU
   workers: 8
-  patience: 30 # early stopping patience
+  patience: 50 # early stopping patience
   amp: true # mixed precision
 
   # 2-stage freeze strategy
@@ -21,9 +21,16 @@ training:
   freeze_epochs: 5 # epochs to keep backbone frozen
 
   # Ultralytics built-in augmentations
-  mosaic: 1.0
+  mosaic: 0.5
   mixup: 0.15
   close_mosaic: 20 # disable mosaic for last 20 epochs
+
+  # Loss weights (Ultralytics defaults: box=7.5, cls=0.5, dfl=1.5)
+  # Increase cls weight since classification is the real bottleneck
+  # Decrease box weight since 90% of bboxes are trivial full-image
+  cls: 2.0
+  box: 3.0
+  dfl: 1.5
 
   seed: 42
 
@@ -34,6 +41,12 @@ paths:
   data_yaml: configs/data.yaml
   project: runs/train
   name: wastevision_v1
+
+# Offline augmentation multipliers (applied before training)
+offline_augmentation:
+  default_multiplier: 3
+  rare_class_multiplier: 5
+  rare_classes: [1, 7, 8]  # food_organics, textile_trash, vegetation
 
 wandb:
   enabled: true
