@@ -12,7 +12,7 @@ for arg in "$@"; do
   esac
 done
 
-echo "=== WasteVision Pipeline ==="
+echo "=== DyrtyVision Pipeline ==="
 
 if [ "$SKIP_DOWNLOAD" = false ]; then
   echo "[1/5] Downloading datasets..."

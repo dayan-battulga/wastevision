@@ -51,7 +51,7 @@ def train(config: dict[str, Any]) -> tuple[Path, Path]:
 
     data_yaml = str(paths.get("data_yaml", "configs/data.yaml"))
     project = str(paths.get("project", "runs/train"))
-    name = str(paths.get("name", "wastevision_v1"))
+    name = str(paths.get("name", "dyrtyvision_v1"))
 
     model_cfg = config.get("model", {})
     arch = model_cfg.get("architecture", "yolov8m")
@@ -158,7 +158,7 @@ def train(config: dict[str, Any]) -> tuple[Path, Path]:
 
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments for training."""
-    parser = argparse.ArgumentParser(description="Train WasteVision YOLOv8 model")
+    parser = argparse.ArgumentParser(description="Train DyrtyVision YOLOv8 model")
     parser.add_argument("--config", type=str, default="configs/train.yaml", help="Training config path")
     parser.add_argument("--model-config", type=str, default="configs/model.yaml", help="Model config path")
     parser.add_argument("--resume", type=str, default=None, help="Path to checkpoint to resume from")

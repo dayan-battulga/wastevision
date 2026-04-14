@@ -3,12 +3,12 @@
 aws:
   region: us-east-1
   ecr:
-    repository: wastevision
+    repository: dyrtyvision
     tag: latest
   ecs:
-    cluster: wastevision-cluster
-    service: wastevision-inference
-    task_family: wastevision-task
+    cluster: dyrtyvision-cluster
+    service: dyrtyvision-inference
+    task_family: dyrtyvision-task
     cpu: 2048       # 2 vCPU
     memory: 4096    # 4 GB
     desired_count: 1

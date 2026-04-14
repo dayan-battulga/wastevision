@@ -1,4 +1,4 @@
-"""FastAPI inference server for WasteVision."""
+"""FastAPI inference server for DyrtyVision."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from fastapi import FastAPI, File, UploadFile
 from pydantic import BaseModel
 
 app = FastAPI(
-    title="WasteVision API",
+    title="DyrtyVision API",
     description="YOLOv8 waste classification inference endpoint",
     version="0.1.0",
 )

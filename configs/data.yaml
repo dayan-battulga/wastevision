@@ -1,4 +1,4 @@
-path: /Users/dayanbattulga/Desktop/personal-code/projects/WasteVision/data/processed
+path: /Users/dayanbattulga/Desktop/personal-code/projects/DyrtyVision/data/processed
 train: images/train
 val: images/val
 test: images/test

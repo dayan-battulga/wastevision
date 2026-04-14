@@ -1,5 +1,5 @@
 {
-  "family": "wastevision-task",
+  "family": "dyrtyvision-task",
   "networkMode": "awsvpc",
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "2048",
@@ -7,8 +7,8 @@
   "executionRoleArn": "arn:aws:iam::ACCOUNT_ID:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
-      "name": "wastevision",
-      "image": "ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/wastevision:latest",
+      "name": "dyrtyvision",
+      "image": "ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/dyrtyvision:latest",
       "portMappings": [
         {
           "containerPort": 8000,
@@ -22,7 +22,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/wastevision",
+          "awslogs-group": "/ecs/dyrtyvision",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
         }

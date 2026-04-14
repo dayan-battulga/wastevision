@@ -1,4 +1,4 @@
-"""Logging configuration for the WasteVision project."""
+"""Logging configuration for the DyrtyVision project."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 def setup_logger(
-    name: str = "wastevision",
+    name: str = "dyrtyvision",
     level: int = logging.INFO,
     log_file: str | Path | None = None,
 ) -> logging.Logger:

@@ -1,4 +1,4 @@
-"""Shared test fixtures for WasteVision."""
+"""Shared test fixtures for DyrtyVision."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from src.data.convert import CLASS_NAMES
 
 @pytest.fixture
 def class_names() -> list[str]:
-    """The 9-class WasteVision taxonomy."""
+    """The 9-class DyrtyVision taxonomy."""
     return CLASS_NAMES
 
 

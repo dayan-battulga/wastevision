@@ -1,4 +1,4 @@
-# Multi-stage Docker build for WasteVision inference server
+# Multi-stage Docker build for DyrtyVision inference server
 
 # --- Stage 1: Builder ---
 FROM python:3.11-slim AS builder

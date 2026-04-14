@@ -122,7 +122,7 @@ def on_train_end(trainer: Any) -> None:
     best_pt = save_dir / "weights" / "best.pt"
     if best_pt.exists():
         artifact = wandb.Artifact(
-            name=f"wastevision-best-{wandb.run.id}",
+            name=f"dyrtyvision-best-{wandb.run.id}",
             type="model",
         )
         artifact.add_file(str(best_pt))

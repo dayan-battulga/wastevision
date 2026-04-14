@@ -57,7 +57,7 @@ def confusion_matrix(
     Args:
         predictions: List of prediction dicts.
         ground_truths: List of ground truth dicts.
-        num_classes: Number of classes (9 for WasteVision).
+        num_classes: Number of classes (9 for DyrtyVision).
         iou_threshold: IoU threshold for matching.
 
     Returns:

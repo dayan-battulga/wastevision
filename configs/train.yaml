@@ -40,7 +40,7 @@ class_weights: [9.2, 18.8, 8.5, 6.4, 10.0, 6.3, 4.8, 21.2, 19.6]
 paths:
   data_yaml: configs/data.yaml
   project: runs/train
-  name: wastevision_v1
+  name: dyrtyvision_v1
 
 # Offline augmentation multipliers (applied before training)
 offline_augmentation:
@@ -50,5 +50,5 @@ offline_augmentation:
 
 wandb:
   enabled: true
-  project: wastevision
+  project: dyrtyvision
   entity: null # set to your W&B team name

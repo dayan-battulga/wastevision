@@ -1,5 +1,5 @@
 [project]
-name = "wastevision"
+name = "dyrtyvision"
 version = "0.1.0"
 description = "YOLOv8-based waste classification: food waste, PET, HDPE, PP, PS, and other trash"
 readme = "README.md"
