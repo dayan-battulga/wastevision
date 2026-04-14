@@ -1,0 +1,109 @@
+================================================================================
+DyrtyVision — Phase 3 Colab Runbook
+================================================================================
+Assumes:
+  - Colab Runtime → Change runtime type → GPU (T4 or better)
+  - The DyrtyVision repo is already cloned to /content/DyrtyVision and is on
+    the latest commit on main.
+  - Your processed dataset is a .zip on Google Drive.
+
+Run the cells top-to-bottom. Cell 6 is the long one (1–3 hours on T4) and
+prints the Gate 3 verdict at the end.
+================================================================================
+
+
+# === CELL 1: GPU sanity check ===
+!nvidia-smi
+
+
+# === CELL 2: Mount Google Drive ===
+from google.colab import drive
+drive.mount('/content/drive')
+
+
+# === CELL 3: Enter repo and install dependencies ===
+%cd /content/DyrtyVision
+!pip install -q -r requirements.txt
+
+
+# === CELL 4: Unzip processed dataset from Drive to local SSD ===
+# EDIT THIS PATH to match where your zip actually lives on Drive:
+DRIVE_ZIP = "/content/drive/MyDrive/processed.zip"
+
+import os
+from pathlib import Path
+
+DEST_PARENT = "/content/DyrtyVision/data"
+DEST = "/content/DyrtyVision/data/processed"
+
+Path(DEST_PARENT).mkdir(parents=True, exist_ok=True)
+if os.path.exists(DEST):
+    !rm -rf {DEST}
+
+# Unzip to data/. Expected zip layout: a top-level "processed/" folder
+# containing images/{train,val,test}/ and labels/{train,val,test}/.
+!unzip -q "{DRIVE_ZIP}" -d {DEST_PARENT}
+
+# --- If your zip layout differs, fix it here: -----------------------------
+# Case A: zip extracts to data/<some_other_name>/  (rename it)
+#   !mv /content/DyrtyVision/data/<some_other_name> {DEST}
+#
+# Case B: zip's top-level is already images/+labels/ (no wrapping folder)
+#   Re-run this cell after replacing the !unzip line with:
+#   Path(DEST).mkdir(parents=True, exist_ok=True)
+#   !unzip -q "{DRIVE_ZIP}" -d {DEST}
+# --------------------------------------------------------------------------
+
+# Confirm the layout — should print: test  train  val
+!ls /content/DyrtyVision/data/processed/images
+
+
+# === CELL 5: Regenerate configs/data.yaml with the Colab path ===
+# run_phase2.py rewrites configs/data.yaml to point at the actual Colab
+# data/processed/ directory. The split step inside it no-ops if the data
+# is already split into train/val/test.
+!python scripts/run_phase2.py
+!cat configs/data.yaml
+
+
+# === CELL 6: Run Phase 3 — offline augmentation + 2-stage training + Gate 3 verify ===
+# This single command:
+#   1. Applies offline augmentation (default x3, rare classes x5:
+#      food_organics, textile_trash, vegetation)
+#   2. Runs 2-stage YOLOv8m training:
+#        Stage 1: backbone frozen for 5 epochs
+#        Stage 2: full fine-tune for the remaining epochs
+#      Uses the rebalanced loss weights from configs/train.yaml
+#      (cls=2.0, box=3.0, dfl=1.5).
+#   3. Runs verify_gate() and prints PASS/FAIL for all 5 Gate 3 criteria:
+#        - Training completed (no OOM/NaN)
+#        - val mAP@0.5 > 0.85
+#        - per-class AP > 0.75
+#        - food_organics precision > 0.90
+#        - no class > 20% misclassification
+#   4. Copies confusion_matrix.png + results.png into experiments/
+#
+# Look for the line "GATE 3: ALL CHECKS PASSED" near the bottom of the output.
+!python scripts/run_phase3.py
+
+
+# === CELL 7: Persist outputs to Drive (so a runtime restart doesn't nuke them) ===
+import shutil
+
+shutil.copytree(
+    "/content/DyrtyVision/experiments",
+    "/content/drive/MyDrive/DyrtyVision/experiments",
+    dirs_exist_ok=True,
+)
+shutil.copytree(
+    "/content/DyrtyVision/runs",
+    "/content/drive/MyDrive/DyrtyVision/runs",
+    dirs_exist_ok=True,
+)
+print("Saved experiments/ and runs/ to Drive.")
+
+
+# === CELL 8 (optional): Re-verify Gate 3 without retraining ===
+# Use this if Cell 6 finished training but you want to re-print the gate
+# verdict, or if you restored a run from Drive into runs/detect/runs/train/.
+!python scripts/run_phase3.py --gate-only runs/detect/runs/train/dyrtyvision_v1_stage2
