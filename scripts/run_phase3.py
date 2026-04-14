@@ -36,11 +36,11 @@ logger = logging.getLogger(__name__)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 
-def run_training() -> Path:
+def run_training() -> tuple[Path, Path]:
     """Execute the 2-stage training pipeline.
 
     Returns:
-        Path to the best weights file.
+        Tuple of (best_weights_path, stage2_run_dir).
     """
     from src.training.train import train
 
@@ -308,12 +308,9 @@ def main() -> None:
     if args.gate_only:
         run_dir = Path(args.gate_only)
     else:
-        best_weights = run_training()
+        best_weights, run_dir = run_training()
         logger.info("Training finished. Best weights: %s", best_weights)
-        run_dir = _find_latest_run_dir()
-        if run_dir is None:
-            logger.error("Could not find training run directory")
-            sys.exit(1)
+        logger.info("Run directory: %s", run_dir)
 
     verify_gate(run_dir)
 

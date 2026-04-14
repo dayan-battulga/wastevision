@@ -29,7 +29,7 @@ def _set_seeds(seed: int) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
-def train(config: dict[str, Any]) -> Path:
+def train(config: dict[str, Any]) -> tuple[Path, Path]:
     """Run a 2-stage YOLOv8 training session.
 
     Stage 1: Backbone frozen for ``freeze_epochs`` epochs.
@@ -39,7 +39,7 @@ def train(config: dict[str, Any]) -> Path:
         config: Merged configuration from model.yaml + train.yaml.
 
     Returns:
-        Path to the best weights file from the final stage.
+        Tuple of (best_weights_path, stage2_run_dir).
     """
     from ultralytics import YOLO
 
@@ -148,8 +148,9 @@ def train(config: dict[str, Any]) -> Path:
     final_dst = experiments_dir / "best.pt"
     shutil.copy2(final_best, final_dst)
     logger.info("Training complete. Best weights copied to %s", final_dst)
+    logger.info("Stage 2 run directory: %s", stage2_dir)
 
-    return final_dst
+    return final_dst, stage2_dir
 
 
 def parse_args() -> argparse.Namespace:

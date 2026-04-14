@@ -266,7 +266,7 @@ def _convert_with_bbox_proposals(
     output_dir: Path,
     label_map: dict[str, int],
     dataset_name: str,
-    confidence_threshold: float = 0.15,
+    confidence_threshold: float = 0.25,
 ) -> int:
     """Convert a folder-based classification dataset using YOLOv8n bbox proposals.
 
@@ -426,7 +426,7 @@ def convert_dataset(
     raw_dir: str | Path,
     output_dir: str | Path,
     dataset_name: str,
-    confidence_threshold: float = 0.15,
+    confidence_threshold: float = 0.25,
 ) -> int:
     """Convert a raw dataset to YOLO-format labels and images.
 
