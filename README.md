@@ -1,4 +1,4 @@
-# WasteVision
+# DyrtyVision
 
 YOLOv8-based waste classification system for sorting recyclables by material type.
 
