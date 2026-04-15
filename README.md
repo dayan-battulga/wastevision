@@ -25,8 +25,8 @@ The production model classifies four plastic resin types, distilled from a broad
 |----|-------|----------|
 | 0 | **PET**  | Water bottles, soda bottles, food trays |
 | 1 | **HDPE** | Milk jugs, detergent bottles, takeaway lids |
-| 2 | **PP**   | Yogurt cups, microwave containers, straws |
-| 3 | **PS**   | Foam cups, packaging trays, disposable cutlery |
+| 2 | **PVC**   | Non-food grade industrial packaging |
+| 3 | **LDPE**   | plastic films and shopping bags |
 
 ---
 
