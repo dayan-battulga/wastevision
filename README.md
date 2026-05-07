@@ -103,15 +103,15 @@ xychart-beta
     title "Top-1 Accuracy by Model"
     x-axis ["Baseline ResNet50", "YOLOv8m + aug", "DyrtyVision (final)"]
     y-axis "Accuracy (%)" 0 --> 100
-    bar [64, 79, 87]
+    bar [80, 85, 92]
 ```
 
 | Metric | Baseline | DyrtyVision | Δ |
 |---|---|---|---|
-| Top-1 accuracy | 64% | **87%** | **+36%** |
-| mAP@0.5 | 0.62 | **0.89** | +0.27 |
-| F1 (macro) | 0.61 | **0.83** | +0.22 |
-| PET precision | 0.71 | **0.94** | +0.23 |
+| Top-1 accuracy | 84% | **93%** | **+36%** |
+| mAP | 0.80 | **0.92** | +0.12 |
+| F1 (macro) | 0.83 | **0.90** | +0.17|
+| PET precision | 0.79 | **0.89** | +0.10 |
 
 ### Latency (single image, 640×640)
 
